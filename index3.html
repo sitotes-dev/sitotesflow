@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard - Ipul's Wealth Journey</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-crosshair@1.2.0"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #6366f1;
+            --primary-light: #a5b4fc;
+            --primary-dark: #4f46e5;
+            --expense: #f43f5e;
+            --expense-light: #fda4af;
+            --saving: #10b981;
+            --saving-light: #6ee7b7;
+            --balance: #8b5cf6;
+            --balance-light: #c4b5fd;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --lighter: #ffffff;
+            --gray: #94a3b8;
+            --gray-dark: #475569;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Manrope', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        
+        .dashboard {
+            width: 95%;
+            max-width: 1400px;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .dashboard::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            animation: rotate 30s linear infinite;
+            opacity: 0.5;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .dashboard-header {
+            padding: 2rem 2.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+        
+        .dashboard-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 1rem;
+        }
+        
+        .dashboard-title h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+        
+        .dashboard-title .period {
+            font-size: 1rem;
+            color: var(--gray);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .dashboard-subtitle {
+            font-size: 1rem;
+            color: var(--gray);
+            font-weight: 400;
+            max-width: 600px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            padding: 1.5rem 2.5rem;
+        }
+        
+        .stat-card {
+            background: rgba(2, 6, 23, 0.4);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+        
+        .stat-card.expense::before {
+            background: linear-gradient(to bottom, var(--expense), var(--expense-light));
+        }
+        
+        .stat-card.saving::before {
+            background: linear-gradient(to bottom, var(--saving), var(--saving-light));
+        }
+        
+        .stat-card.balance::before {
+            background: linear-gradient(to bottom, var(--balance), var(--balance-light));
+        }
+        
+        .stat-card h3 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            font-feature-settings: 'tnum';
+        }
+        
+        .stat-card .change {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .stat-card .change.positive {
+            color: var(--saving);
+        }
+        
+        .stat-card .change.negative {
+            color: var(--expense);
+        }
+        
+        .chart-container {
+            padding: 0 2.5rem 2rem;
+            position: relative;
+        }
+        
+        .chart-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .timeframe-selector {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(2, 6, 23, 0.4);
+            border-radius: 12px;
+            padding: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .timeframe-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--gray);
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .timeframe-btn:hover {
+            color: var(--light);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .timeframe-btn.active {
+            color: var(--light);
+            background: var(--primary);
+        }
+        
+        .date-selector {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            background: rgba(2, 6, 23, 0.4);
+            border-radius: 12px;
+            padding: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .date-selector select {
+            background: rgba(2, 6, 23, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: var(--light);
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .date-selector select:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .date-selector select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            background: rgba(2, 6, 23, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .legend-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        
+        .legend-item.active {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: var(--primary);
+        }
+        
+        .legend-marker {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+        }
+        
+        .legend-marker.expense {
+            background: linear-gradient(135deg, var(--expense), var(--expense-light));
+        }
+        
+        .legend-marker.saving {
+            background: linear-gradient(135deg, var(--saving), var(--saving-light));
+        }
+        
+        .legend-marker.balance {
+            background: linear-gradient(135deg, var(--balance), var(--balance-light));
+        }
+        
+        .legend-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .chart-wrapper {
+            background: rgba(2, 6, 23, 0.4);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            height: 500px;
+            position: relative;
+        }
+        
+        #chart {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .detail-panel {
+            background: rgba(2, 6, 23, 0.4);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1.5rem 2.5rem 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .transaction-detail {
+            padding-right: 1.5rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .detail-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--light);
+        }
+        
+        .detail-date {
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 500;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+            color: var(--gray);
+        }
+        
+        .detail-label .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .detail-label .indicator.expense {
+            background: var(--expense);
+        }
+        
+        .detail-label .indicator.saving {
+            background: var(--saving);
+        }
+        
+        .detail-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        
+        .detail-value.positive {
+            color: var(--saving);
+        }
+        
+        .detail-value.negative {
+            color: var(--expense);
+        }
+        
+        .summary-card {
+            background: rgba(2, 6, 23, 0.4);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .summary-card h4 {
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .summary-change.positive {
+            color: var(--saving);
+        }
+        
+        .summary-change.negative {
+            color: var(--expense);
+        }
+        
+        .dashboard-footer {
+            padding: 1.5rem 2.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .footer-btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            border: none;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .footer-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .footer-btn.primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .footer-btn.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+        }
+        
+        .footer-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .copyright {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .dashboard {
+                max-width: 100%;
+                border-radius: 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .transaction-detail {
+                padding-right: 0;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                padding-bottom: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-header, .stats-grid, .chart-container, .detail-panel, .dashboard-footer {
+                padding: 1.5rem;
+            }
+            
+            .dashboard-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .dashboard-title h1 {
+                font-size: 1.8rem;
+            }
+            
+            .chart-toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .date-selector {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .footer-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .footer-btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="dashboard-header">
+            <div class="dashboard-title">
+                <h1>Financial Dashboard</h1>
+                <div class="period">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span id="current-period">Januari 2025</span>
+                </div>
+            </div>
+            <p class="dashboard-subtitle" id="dashboard-subtitle">Visualisasi lengkap pengeluaran, tabungan, dan saldo keuangan Ipul selama bulan Januari 2025</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card expense">
+                <h3>Total Pengeluaran</h3>
+                <p class="value" id="total-expense">Rp 0</p>
+                <div class="change negative" id="expense-change">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="19" x2="12" y2="5"></line>
+                        <polyline points="5 12 12 5 19 12"></polyline>
+                    </svg>
+                    <span>12% dari bulan lalu</span>
+                </div>
+            </div>
+            
+            <div class="stat-card saving">
+                <h3>Total Tabungan</h3>
+                <p class="value" id="total-saving">Rp 0</p>
+                <div class="change positive" id="saving-change">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <polyline points="19 12 12 19 5 12"></polyline>
+                    </svg>
+                    <span>24% dari bulan lalu</span>
+                </div>
+            </div>
+            
+            <div class="stat-card balance">
+                <h3>Saldo Akhir</h3>
+                <p class="value" id="total-balance">Rp 0</p>
+                <div class="change positive" id="balance-change">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <polyline points="19 12 12 19 5 12"></polyline>
+                    </svg>
+                    <span>8% dari bulan lalu</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-toolbar">
+                <div class="timeframe-selector">
+                    <button class="timeframe-btn" data-timeframe="daily">Harian</button>
+                    <button class="timeframe-btn" data-timeframe="weekly">Mingguan</button>
+                    <button class="timeframe-btn active" data-timeframe="monthly">Bulanan</button>
+                    <button class="timeframe-btn" data-timeframe="yearly">Tahunan</button>
+                </div>
+                
+                <div class="date-selector" id="daily-selector">
+                    <select id="daily-month">
+                        <option value="0">Januari</option>
+                        <option value="1">Februari</option>
+                        <option value="2">Maret</option>
+                        <option value="3">April</option>
+                        <option value="4">Mei</option>
+                        <option value="5">Juni</option>
+                        <option value="6">Juli</option>
+                        <option value="7">Agustus</option>
+                        <option value="8">September</option>
+                        <option value="9">Oktober</option>
+                        <option value="10">November</option>
+                        <option value="11">Desember</option>
+                    </select>
+                    <select id="daily-year">
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                        <option value="2025" selected>2025</option>
+                    </select>
+                </div>
+                
+                <div class="date-selector" id="weekly-selector" style="display: none;">
+                    <select id="weekly-month">
+                        <option value="0">Januari</option>
+                        <option value="1">Februari</option>
+                        <option value="2">Maret</option>
+                        <option value="3">April</option>
+                        <option value="4">Mei</option>
+                        <option value="5">Juni</option>
+                        <option value="6">Juli</option>
+                        <option value="7">Agustus</option>
+                        <option value="8">September</option>
+                        <option value="9">Oktober</option>
+                        <option value="10">November</option>
+                        <option value="11">Desember</option>
+                    </select>
+                    <select id="weekly-year">
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                        <option value="2025" selected>2025</option>
+                    </select>
+                </div>
+                
+                <div class="date-selector" id="monthly-selector" style="display: none;">
+                    <select id="yearly-year">
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                        <option value="2025" selected>2025</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="chart-legend">
+                <div class="legend-item active" data-dataset="0">
+                    <div class="legend-marker expense"></div>
+                    <span class="legend-text">Pengeluaran</span>
+                </div>
+                <div class="legend-item active" data-dataset="1">
+                    <div class="legend-marker saving"></div>
+                    <span class="legend-text">Tabungan</span>
+                </div>
+                <div class="legend-item active" data-dataset="2">
+                    <div class="legend-marker balance"></div>
+                    <span class="legend-text">Saldo Bersih</span>
+                </div>
+            </div>
+            
+            <div class="chart-wrapper">
+                <canvas id="stats-chart"></canvas>
+            </div>
+        </div>
+        
+        <div class="detail-panel">
+            <div class="transaction-detail">
+                <div class="detail-header">
+                    <h3>Detail Transaksi</h3>
+                    <div class="detail-date" id="detail-date">Pilih tanggal pada grafik</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <div class="indicator expense"></div>
+                        <span>Pengeluaran</span>
+                    </div>
+                    <div class="detail-value negative" id="detail-expense">Rp 0</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <div class="indicator saving"></div>
+                        <span>Tabungan</span>
+                    </div>
+                    <div class="detail-value positive" id="detail-saving">Rp 0</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <div class="indicator balance"></div>
+                        <span>Saldo Harian</span>
+                    </div>
+                    <div class="detail-value" id="detail-balance">Rp 0</div>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h4>Ringkasan Hari Ini</h4>
+                <p class="summary-value" id="summary-balance">Rp 0</p>
+                <p class="summary-change positive" id="summary-change">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="19" x2="12" y2="5"></line>
+                        <polyline points="5 12 12 5 19 12"></polyline>
+                    </svg>
+                    <span>0% dari kemarin</span>
+                </p>
+            </div>
+        </div>
+        
+        <div class="dashboard-footer">
+            <div class="copyright">
+                © 2025 Ipul's Financial Dashboard. All rights reserved.
+            </div>
+            
+            <div class="footer-actions">
+                <button class="footer-btn secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export
+                </button>
+                <button class="footer-btn primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 4.2v10.3"></path>
+                    </svg>
+                    Simpan Laporan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="chart-apik.js"></script>
+</body>
+</html>
