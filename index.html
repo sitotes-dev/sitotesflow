@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitotes Flow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="sitotesflow-style.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="loading-backdrop"></div>
+    <div class="loading"></div>
+    <div id="login-main">
+        <h1>SiTotes Flow</h1>
+        <div class="login-container">
+            <h3>Masuk kembali</h3>
+            <div class="login-card">
+                <input type="text" id="username-login" placeholder="Username" required>
+            </div>
+            <button onclick="login()">Login</button>
+        </div>
+        <p>Akun tidak bisa dibuat sendiri. Pembelian hanya via instagram: <a style="color: #ffefff;" href="https://instagram.com/m.saiful.anam.r">@m.saiful.anam.r</a><p style="font-size: 12px; margin-top: 10px;">Developer, (Design - app & visual), Progamer</p></p>
+    </div>
+    <div id="main-conn">
+        <header>
+            <div class="header-left">
+                <button id="menu-toggle" class="menu-btn">
+                    <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                <h1>Sitotes Flow</h1>
+            </div>
+            <div class="profile">
+                <div id="accent-menu" class="accent-menu">
+                    <a href="#" onclick="setAccentColor('pink')"><p>Pink</p></a>
+                    <a href="#" onclick="setAccentColor('cyan')"><p>Cyan</p></a>
+                    <a href="#" onclick="setAccentColor('purple')"><p>Ungu</p></a>
+                </div>
+                <img class="profileimg" id="profile-img">
+                <div id="profile-menu" class="profile-menu">
+                    <a href="#">
+                        <div id="theme-toggle" class="theme-icon-toggle">
+                          <svg id="theme-icon" width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                            <path id="theme-icon-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 4V2m0 20v-2m8-8h2M2 12H4m14.12 5.88l1.42 1.42M4.47 4.47l1.42 1.42M16.24 7.76l1.42-1.42M6.34 17.66l-1.42 1.42M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                          </svg>
+                        </div>
+                    </a>
+                    <hr>
+                    <a href="#" id="switch-accent"><p>Warna</p></a>
+                    <hr>
+                    <a href="#" id="ubah-profile"><p>Ubah Profil</p></a>
+                    <!-- <a href="#"><p>Ganti Nama Pengguna</p></a> -->
+                    <hr>
+                    <a href="#" onclick="siginOut()"><p>Keluar</p></a>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <!-- Sidebar -->
+            <div class="dialog-backdrop" id="dialog-backdrop"></div>
+            <div class="dialog-menu" id="dialog-menu">
+                <div class="content">
+                    <div class="ubahprofil-menu" id="ubahprofil-menu">
+                        <h3>Ubah Profile</h3>
+                        <img class="profileimg" id="upload-img" alt="">
+                        <div class="progress-bar-upload"><div class="progress" id="progress"></div></div>
+                        <form id="uploadForm">
+                            <input type="file" name="file" id="fileInput" required style="display: none;" />
+                            <button type="button" id="autoUploadBtn">Upload</button>
+                        </form>
+                    </div>
+                <button id="selesai">Selesai</button>
+                </div>
+            </div>
+            <aside id="sidebar" class="sidebar">
+                <nav>
+                    <a href="#tambah-transaksi" class="active">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Tambah Transaksi
+                    </a>
+                    <a href="#daftar-transaksi">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Daftar Transaksi
+                    </a>
+                    <a href="#statistik">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2v12a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Statistik
+                    </a>
+                    <a href="#target">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Target Tabungan
+                    </a>
+                    <a href="#pengingat">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2                        0 00-2-2h-4a2 2 0 00-2 2v.341C7.67 6.165 6 7.388 6 9v5.158c0 .733-.262 1.405-.595 1.937L4 17h5m6 0v1a3 3 0 01-6 0v-1m6 0H9"></path>
+                        </svg>
+                        Pengingat Harian
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Floating Action Button -->
+            <a href="#tambah-transaksi" class="fab">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+            </a>
+
+            <!-- Main Content -->
+            <main>
+                <!-- Notifikasi -->
+                <div id="notification" class="notification"></div>
+                <!-- Tambah Transaksi -->
+                <section id="tambah-transaksi" class="section">
+                    <h2>Tambah Transaksi Baru</h2>
+                    <div class="card">
+                        <form id="transaction-form">
+                            <div>
+                                <label for="amount">Nominal (Rp)</label>
+                                <input type="text" id="amount" placeholder="5.000" oninput="formatNumber(this)" required>
+                            </div>
+                            <div>
+                                <label for="type">Jenis</label>
+                                <select id="type" onchange="toggleDescription()">
+                                    <option value="income">Pemasukan (+)</option>
+                                    <option value="expense">Pengeluaran (-)</option>
+                                </select>
+                            </div>
+                            <div id="category-field" style="display: none;">
+                                <label for="category">Kategori</label>
+                                <select id="category">
+                                    <option value="makanan">Makanan</option>
+                                    <option value="transportasi">Transportasi</option>
+                                    <option value="hiburan">Hiburan</option>
+                                    <option value="belanja">Belanja</option>
+                                    <option value="lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <div id="description-field" style="display: none;">
+                                <label for="description">Keterangan</label>
+                                <input type="text" id="description" placeholder="Contoh: Beli Cilok">
+                            </div>
+                            <button type="submit">Tambah Transaksi</button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Daftar Transaksi -->
+                <section id="daftar-transaksi" class="section">
+                    <h2>Riwayat Transaksi</h2>
+                    <div class="filter-search">
+                        <div class="search-box">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <input type="text" id="search" placeholder="Cari transaksi..." oninput="searchTransactions()">
+                        </div>
+                        <div class="flecc-box" style="display: none;">
+                            <select id="month-filter">
+                                <option value="all">Semua Bulan</option>
+                                <option value="2025-01">Januari 2025</option>
+                            </select>
+                            <select id="type-filter">
+                                <option value="all">Semua Jenis</option>
+                                <option value="income">Pemasukan</option>
+                                <option value="expense">Pengeluaran</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card" style="position: relative;">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Hari</th>
+                                        <th>Nominal</th>
+                                        <th>Kategori</th>
+                                        <th>Keterangan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transaction-table"></tbody>
+                            </table>
+                        </div>
+                        <button class="buttonc" onclick="exportCSV()">Unduh CSV</button>
+                        <button class="buttonc" onclick="backupData()">Backup Data</button>
+                    </div>
+                    <div class="card">
+                        <h3>Sorot Data</h3>
+                        <div class="timeframe-selector">
+                            <button class="profile-btn" style="display: none;">> PP <</button>
+                            <button class="timeframe-btn active" data-timeframe="daily">Harian</button>
+                            <button class="timeframe-btn" data-timeframe="weekly">Mingguan</button>
+                            <button class="timeframe-btn" data-timeframe="monthly">Bulanan</button>
+                            <button class="timeframe-btn" data-timeframe="yearly">Tahunan</button>
+                        </div>
+                        
+                        <div class="date-selector" id="daily-selector">
+                            <select id="daily-month"></select>
+                            <select id="daily-year"></select>
+                        </div>
+                        
+                        <div class="date-selector" id="weekly-selector" style="display: none;">
+                            <select id="weekly-month">
+                                <option value="0">Januari</option>
+                                <option value="1">Februari</option>
+                                <option value="2">Maret</option>
+                                <option value="3">April</option>
+                                <option value="4">Mei</option>
+                                <option value="5">Juni</option>
+                                <option value="6">Juli</option>
+                                <option value="7">Agustus</option>
+                                <option value="8">September</option>
+                                <option value="9">Oktober</option>
+                                <option value="10">November</option>
+                                <option value="11">Desember</option>
+                            </select>
+                            <select id="weekly-year">
+                                <option value="2023">2023</option>
+                                <option value="2024">2024</option>
+                                <option value="2025" selected>2025</option>
+                            </select>
+                        </div>
+                        
+                        <div class="date-selector" id="monthly-selector" style="display: none;">
+                            <select id="yearly-year">
+                                <option value="2021">2021</option>
+                                <option value="2022">2022</option>
+                                <option value="2023">2023</option>
+                                <option value="2024">2024</option>
+                                <option value="2025" selected>2025</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Statistik -->
+                <section id="statistik" class="section">
+                    <h2>Statistik</h2>
+                    <div class="stats-grid">
+                        <div class="card tooltip" data-tooltip="Total saldo saat ini">
+                            <h3>Total Pengeluaran</h3>
+                            <p class="value" id="total-expense">Rp 0</p>
+                            <div class="change negative" id="expense-change">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                                    <polyline points="5 12 12 5 19 12"></polyline>
+                                </svg>
+                                <span>0% dari bulan lalu</span>
+                            </div>
+                        </div>
+                        <div class="card tooltip" data-tooltip="Pemasukan bulan Januari 2025">
+                            <h3>Total Tabungan</h3>
+                            <p class="value" id="total-saving">Rp 0</p>
+                            <div class="change positive" id="saving-change">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <polyline points="19 12 12 19 5 12"></polyline>
+                                </svg>
+                                <span>0% dari bulan lalu</span>
+                            </div>
+                        </div>
+                        <div class="card tooltip" data-tooltip="Pengeluaran bulan Januari 2025">
+                            <h3>Saldo Akhir</h3>
+                            <p class="value" id="total-balance">Rp 0</p>
+                            <div class="change positive" id="balance-change">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <polyline points="19 12 12 19 5 12"></polyline>
+                                </svg>
+                                <span>0% dari bulan lalu</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item active" data-dataset="0">
+                            <div class="legend-marker expense"></div>
+                            <span class="legend-text">Pengeluaran</span>
+                        </div>
+                        <div class="legend-item active" data-dataset="1">
+                            <div class="legend-marker saving"></div>
+                            <span class="legend-text">Tabungan</span>
+                        </div>
+                        <div class="legend-item active" data-dataset="2">
+                            <div class="legend-marker balance"></div>
+                            <span class="legend-text">Saldo Bersih</span>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-wrapper">
+                        <canvas id="stats-chart"></canvas>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h4>Ringkasan Hari Ini</h4>
+                        <p class="summary-value" id="summary-balance">Rp 0</p>
+                        <p class="summary-change positive" id="summary-change">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="19" x2="12" y2="5"></line>
+                                <polyline points="5 12 12 5 19 12"></polyline>
+                            </svg>
+                            <span>0% dari kemarin</span>
+                        </p>
+                    </div>
+
+
+                    <div class="card">
+                        <h3>Grafik Pemasukan & Pengeluaran</h3>
+                        <canvas id="stats-chart-up"></canvas>
+                    </div>
+                    <div class="card">
+                        <h3>Distribusi Pengeluaran per Kategori</h3>
+                        <canvas id="category-chart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Target Tabungan -->
+                <section id="target" class="section">
+                    <h2>Target Tabungan</h2>
+                    <div class="card tooltip" data-tooltip="Progres menuju target Rp 50.000">
+                        <p><strong>Target:</strong> Rp 50.000 per Februari 2025</p>
+                        <p><strong>Saat Ini:</strong> Rp 3.000</p>
+                        <div class="progress-bar">
+                            <div style="width: 6%;"></div>
+                        </div>
+                        <p style="font-size: 0.95rem; margin-top: 1rem;">6% dari target tercapai</p>
+                    </div>
+                </section>
+
+                <!-- Pengingat Harian -->
+                <section id="pengingat" class="section">
+                    <h2>Pengingat Harian</h2>
+                    <div class="card">
+                        <form id="reminder-form">
+                            <div>
+                                <label for="reminder-amount">Nominal Harian (Rp)</label>
+                                <input type="text" id="reminder-amount" placeholder="1.000" oninput="formatNumber(this)">
+                            </div>
+                            <div>
+                                <label for="reminder-time">Waktu Pengingat</label>
+                                <input type="time" id="reminder-time">
+                            </div>
+                            <button type="submit">Atur Pengingat</button>
+                        </form>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+ 
+    <script src="sitotesflow-script.js"></script>
+</body>
+</html>
