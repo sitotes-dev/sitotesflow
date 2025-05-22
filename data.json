@@ -1,0 +1,198 @@
+{
+  "daily": {
+    "0-2025": {
+      "labels": [
+        "1 Jan",
+        "2 Jan",
+        "3 Jan",
+        "4 Jan",
+        "5 Jan",
+        "6 Jan",
+        "7 Jan",
+        "8 Jan",
+        "9 Jan",
+        "10 Jan"
+      ],
+      "pengeluaran": [
+        10000,
+        50000,
+        100000,
+        150000,
+        200000,
+        250000,
+        300000,
+        350000,
+        400000,
+        450000
+      ],
+      "tabungan": [
+        0,
+        60000,
+        120000,
+        180000,
+        240000,
+        300000,
+        360000,
+        420000,
+        480000,
+        540000
+      ],
+      "pengeluaranAsli": [
+        0,
+        -50000,
+        -100000,
+        -150000,
+        -200000,
+        -250000,
+        -300000,
+        -350000,
+        -400000,
+        -450000
+      ],
+      "saldoHarian": [
+        0,
+        10000,
+        30000,
+        60000,
+        100000,
+        150000,
+        210000,
+        280000,
+        360000,
+        450000
+      ],
+      "totalPengeluaran": 2250000,
+      "totalTabungan": 2700000,
+      "totalSaldo": 450000,
+      "prevPeriodChange": {
+        "expense": 0,
+        "saving": 0,
+        "balance": 0
+      }
+    }
+  },
+  "weekly": {
+    "0-2025": {
+      "labels": [
+        "Minggu 1, Januari",
+        "Minggu 2, Januari",
+        "Minggu 3, Januari",
+        "Minggu 4, Januari"
+      ],
+      "pengeluaran": [
+        200000,
+        150000,
+        180000,
+        160000
+      ],
+      "tabungan": [
+        250000,
+        300000,
+        220000,
+        200000
+      ],
+      "pengeluaranAsli": [
+        -200000,
+        -150000,
+        -180000,
+        -160000
+      ],
+      "saldoHarian": [
+        50000,
+        200000,
+        240000,
+        280000
+      ],
+      "totalPengeluaran": 690000,
+      "totalTabungan": 970000,
+      "totalSaldo": 280000,
+      "prevPeriodChange": {
+        "expense": 0,
+        "saving": 0,
+        "balance": 0
+      }
+    }
+  },
+  "monthly": {
+    "2025": {
+      "labels": [
+        "Jan",
+        "Feb",
+        "Mar"
+      ],
+      "pengeluaran": [
+        300000,
+        400000,
+        350000
+      ],
+      "tabungan": [
+        500000,
+        450000,
+        600000
+      ],
+      "pengeluaranAsli": [
+        -300000,
+        -400000,
+        -350000
+      ],
+      "saldoHarian": [
+        200000,
+        250000,
+        500000
+      ],
+      "totalPengeluaran": 1050000,
+      "totalTabungan": 1550000,
+      "totalSaldo": 500000,
+      "prevPeriodChange": {
+        "expense": 0,
+        "saving": 0,
+        "balance": 0
+      }
+    }
+  },
+  "yearly": {
+    "labels": [
+      "2021",
+      "2022",
+      "2023",
+      "2024",
+      "2025"
+    ],
+    "pengeluaran": [
+      300000,
+      350000,
+      400000,
+      450000,
+      500000
+    ],
+    "tabungan": [
+      500000,
+      550000,
+      600000,
+      650000,
+      700000
+    ],
+    "pengeluaranAsli": [
+      -300000,
+      -350000,
+      -400000,
+      -450000,
+      -500000
+    ],
+    "saldoHarian": [
+      200000,
+      400000,
+      600000,
+      800000,
+      1000000
+    ],
+    "totalPengeluaran": 2000000,
+    "totalTabungan": 3000000,
+    "totalSaldo": 1000000,
+    "prevPeriodChange": {
+      "expense": 5,
+      "saving": 10,
+      "balance": 7
+    }
+  }
+}

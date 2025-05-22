@@ -40,7 +40,7 @@
                     <a href="#" onclick="setAccentColor('cyan')"><p>Cyan</p></a>
                     <a href="#" onclick="setAccentColor('purple')"><p>Ungu</p></a>
                 </div>
-                <img class="profileimg" id="profile-img">
+                <img class="profileimg" id="profile-img" onerror="null; this.src='./img/users.png';">
                 <div id="profile-menu" class="profile-menu">
                     <a href="#">
                         <div id="theme-toggle" class="theme-icon-toggle">
@@ -68,7 +68,7 @@
                 <div class="content">
                     <div class="ubahprofil-menu" id="ubahprofil-menu">
                         <h3>Ubah Profile</h3>
-                        <img class="profileimg" id="upload-img" alt="">
+                        <img class="profileimg" id="upload-img" alt="" onerror="null; this.src='./img/users.png';">
                         <div class="progress-bar-upload"><div class="progress" id="progress"></div></div>
                         <form id="uploadForm">
                             <input type="file" name="file" id="fileInput" required style="display: none;" />
@@ -203,7 +203,7 @@
                     <div class="card">
                         <h3>Sorot Data</h3>
                         <div class="timeframe-selector">
-                            <button class="profile-btn" style="display: none;">> PP <</button>
+                            <button class="profile-btn active">> PP <</button>
                             <button class="timeframe-btn active" data-timeframe="daily">Harian</button>
                             <button class="timeframe-btn" data-timeframe="weekly">Mingguan</button>
                             <button class="timeframe-btn" data-timeframe="monthly">Bulanan</button>
@@ -287,7 +287,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="chart-legend">
+                    <div class="chart-legend" style="display: none;">
                         <div class="legend-item active" data-dataset="0">
                             <div class="legend-marker expense"></div>
                             <span class="legend-text">Pengeluaran</span>
@@ -302,11 +302,11 @@
                         </div>
                     </div>
                     
-                    <div class="chart-wrapper">
+                    <div class="chart-wrapper" style="display: none;">
                         <canvas id="stats-chart"></canvas>
                     </div>
                     
-                    <div class="summary-card">
+                    <div class="summary-card" style="display: none;">
                         <h4>Ringkasan Hari Ini</h4>
                         <p class="summary-value" id="summary-balance">Rp 0</p>
                         <p class="summary-change positive" id="summary-change">
@@ -319,18 +319,18 @@
                     </div>
 
 
-                    <div class="card">
+                    <div class="card" style="display: none;">
                         <h3>Grafik Pemasukan & Pengeluaran</h3>
                         <canvas id="stats-chart-up"></canvas>
                     </div>
-                    <div class="card">
+                    <div class="card"  style="display: none;">
                         <h3>Distribusi Pengeluaran per Kategori</h3>
                         <canvas id="category-chart"></canvas>
                     </div>
                 </section>
 
                 <!-- Target Tabungan -->
-                <section id="target" class="section">
+                <section id="target" class="section" style="display: none;">
                     <h2>Target Tabungan</h2>
                     <div class="card tooltip" data-tooltip="Progres menuju target Rp 50.000">
                         <p><strong>Target:</strong> Rp 50.000 per Februari 2025</p>
@@ -343,7 +343,7 @@
                 </section>
 
                 <!-- Pengingat Harian -->
-                <section id="pengingat" class="section">
+                <section id="pengingat" class="section" style="display: none;">
                     <h2>Pengingat Harian</h2>
                     <div class="card">
                         <form id="reminder-form">

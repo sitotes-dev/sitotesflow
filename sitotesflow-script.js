@@ -9,6 +9,7 @@ const isLight = savedTheme === 'light';
 let username = localStorage.getItem('username');
 let dataMode = 'daily'
 let dataProMod = 'day'
+let pepeIs = true
 let rawData
 let rawEd
 let imgObjectUrl
@@ -131,7 +132,38 @@ async function dashboardLoad(data) {
     }
     rawData = fal
     renderTransactions(fal)
+    renderGrafic(fal)
 }
+
+function renderGrafic(filtered = { transaction: [] }) {
+    const totalExpense = document.getElementById('total-expense')
+    const totalSaving = document.getElementById('total-saving')
+    const totalBalance = document.getElementById('total-balance')
+    let minus = 0
+    let pluss = 0
+    let total = 0
+
+    if (filtered.transaction.length === 0) {
+        totalExpense.textContent = 'Rp 10000';
+        totalSaving.textContent = 'Rp 10000';
+        totalBalance.textContent = 'Rp 10000';
+        return;
+    }
+
+    const trans = filtered.transaction;
+    trans.forEach((t, index) => {
+        if(t.jumlah < 0) {
+            minus += t.jumlah
+        } else {
+            pluss += t.jumlah
+        }
+    })
+
+    totalExpense.textContent = 'Rp ' + Math.abs(minus).toLocaleString('id-ID').replace(/,/g, '.');
+    totalSaving.textContent = 'Rp ' + Math.abs(pluss).toLocaleString('id-ID').replace(/,/g, '.');
+    totalBalance.textContent = 'Rp ' + Math.abs((pluss+minus)).toLocaleString('id-ID').replace(/,/g, '.');
+}
+
 
 function renderTransactions(filtered = { transaction: [] }) {
     const transactionTable = document.getElementById('transaction-table');
@@ -171,13 +203,13 @@ function renderTransactions(filtered = { transaction: [] }) {
             const deleteBtnDisabled = dataMode === 'daily' ? '' : 'style="pointer-events: none; cursor: none; opacity: 0.2;"';
 
             document.querySelectorAll('th').forEach(th => {
-                if (th.textContent.trim() === "Bulan" || th.textContent.trim() === "Tahun" || th.textContent.trim() === "Profile") {
+                if (th.textContent.trim() === "Bulan" || th.textContent.trim() === "Minggu" || th.textContent.trim() === "Tahun" || th.textContent.trim() === "Profile") {
                     th.textContent = "Tanggal"
                 }
             })
 
             document.querySelectorAll('th').forEach(th => {
-                if (th.textContent.trim() === "Users") {
+                if (th.textContent.trim() === "Users" || th.textContent.trim() === "Tgl") {
                     th.textContent = "Hari"
                 }
             })
@@ -185,18 +217,22 @@ function renderTransactions(filtered = { transaction: [] }) {
             if (dataMode === 'daily') {
                 document.querySelectorAll('th').forEach(th => {
                     if (th.textContent.trim() === "Tanggal") {
-                        th.textContent = "Profile"
+                        if (pepeIs) th.textContent = "Profile"
                     }
                 })
                 document.querySelectorAll('th').forEach(th => {
                     if (th.textContent.trim() === "Hari") {
-                        th.textContent = "Users"
+                        if (pepeIs) th.textContent = "Users"
                     }
                 })
+                let dev = `       <td style="text-align: center;">${date.split('/')[0]}</td>
+                                  <td style="text-align: center;">${hari}</td>`
+                
+                if (pepeIs) dev = `<td style="text-align: center;"><img src="${ImgProfile[t.by].imgObj || ''}" class="profileimg" onerror="null; this.src='./img/users.png';"></td>
+                                   <td style="text-align: center;">${t.by}</td>`
                 transactionTable.innerHTML += `
                     <tr>
-                        <td style="text-align: center;"><img src="${ImgProfile[t.by].imgObj || ''}" class="profileimg"></td>
-                        <td style="text-align: center;">${t.by}</td>
+                        ${dev}
                         <td style="color: ${t.jumlah > 0 ? '#34d399' : '#f87171'};">${t.jumlah > 0 ? '+' : ''}Rp ${Math.abs(t.jumlah).toLocaleString('id-ID').replace(/,/g, '.')}</td>
                         <td>${t.categ}</td>
                         <td>${t.info}</td>
@@ -205,10 +241,21 @@ function renderTransactions(filtered = { transaction: [] }) {
                 `;
             }
             if (dataMode === 'weekly') {
+                document.querySelectorAll('th').forEach(th => {
+                    if (th.textContent.trim() === "Tanggal") {
+                        th.textContent = "Minggu"
+                    }
+                })
+                document.querySelectorAll('th').forEach(th => {
+                    if (th.textContent.trim() === "Hari") {
+                        th.textContent = "Tgl"
+                    }
+                })
+                let dev = ['ke`satu', 'ke`dua', 'ke`tiga', 'ke`empat', 'ke`lima']
                 transactionTable.innerHTML += `
                     <tr>
+                        <td>${dev[index]}</td>
                         <td style="text-align: center;">${date.split('/')[0]}</td>
-                        <td>${hari}</td>
                         <td style="color: ${t.jumlah > 0 ? '#34d399' : '#f87171'};">${t.jumlah > 0 ? '+' : ''}Rp ${Math.abs(t.jumlah).toLocaleString('id-ID').replace(/,/g, '.')}</td>
                         <td>${t.categ}</td>
                         <td>${t.info}</td>
@@ -301,14 +348,16 @@ function uiResponLoad() {
         if (fileInput.files.length === 0) return;
         hideDialog.style.display = 'none'
         uploadBtn.style.display = 'none'
+        const resizeFile = await resizeImage(fileInput.files[0], 300)
         document.querySelector('.progress-bar-upload').style.display = 'block'
         const reader = new FileReader()
         reader.onload = function(e) {
             uploadImg.src = e.target.result
         }
         reader.readAsDataURL(fileInput.files[0])
+
         const formData = new FormData();
-        formData.append('file', fileInput.files[0]);
+        formData.append('file', resizeFile);
         formData.append('customName', username);
         formData.append('autoReplace', 'true');
 
@@ -436,6 +485,14 @@ function uiResponLoad() {
             document.querySelector('.timeframe-btn.active').classList.remove('active');
             this.classList.add('active');
             dataMode = timeframe;
+            
+            const profileShow = document.querySelector('.profile-btn')
+            if(timeframe === 'daily') {
+                profileShow.style.display = 'inline'
+            } else {
+                profileShow.style.display = 'none'
+            }
+
             setDataShort(timeframe, fal)
         });
     });
@@ -445,10 +502,14 @@ function uiResponLoad() {
         if (this.classList.contains('active')) {
             this.classList.remove('active')
             this.textContent = '> PP <'
+            pepeIs = false
         } else {
             this.classList.add('active');
             this.textContent = '< PP >'
+            pepeIs = true
         }
+
+        renderTransactions(rawData)
     });
 }
 
@@ -635,7 +696,7 @@ async function generateImgProfile(users, apii) {
 
   for (const user of users) {
     try {
-        if (!user.img === '') {
+        if (!user.img == '') {
             const response = await fetch(apii+'/drive/image?id='+user.img);
             const blob = await response.blob();
             const objectUrl = URL.createObjectURL(blob);
@@ -743,6 +804,35 @@ function sortByYear(transactions) {
 
     result.sort((a, b) => parseDate(a.date) - parseDate(b.date));
     return result;
+}
+
+function resizeImage(file, maxSize = 200) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            img.src = e.target.result;
+        };
+
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            const scale = Math.min(maxSize / img.width, maxSize / img.height);
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob((blob) => {
+                resolve(new File([blob], file.name, { type: file.type }));
+            }, file.type, 0.8);
+        };
+
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
 }
 
 
